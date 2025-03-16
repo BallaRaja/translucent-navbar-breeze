@@ -1,9 +1,36 @@
-
-import React from 'react';
+import React, { useState } from 'react';
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { CalendarIcon, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 const Calendar: React.FC = () => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const dates = Array.from({ length: 31 }, (_, i) => i + 1);
+  const [date, setDate] = useState<Date>();
+  
+  // Event types
+  const eventTypes = [
+    { value: 'meeting', label: 'Team Meeting' },
+    { value: 'review', label: 'Product Review' },
+    { value: 'call', label: 'Client Call' },
+    { value: 'workshop', label: 'Workshop' },
+    { value: 'deadline', label: 'Deadline' },
+    { value: 'social', label: 'Social Event' },
+    { value: 'presentation', label: 'Presentation' },
+    { value: 'planning', label: 'Planning' },
+  ];
   
   // Events data
   const events = [
@@ -37,6 +64,41 @@ const Calendar: React.FC = () => {
 
   const today = new Date().getDate(); // Current day of month
 
+  // Form schema for event creation
+  const formSchema = z.object({
+    title: z.string().min(2, {
+      message: "Event title must be at least 2 characters.",
+    }),
+    type: z.string({
+      required_error: "Please select an event type.",
+    }),
+    date: z.date({
+      required_error: "Please select a date for the event.",
+    }),
+    time: z.string().min(1, {
+      message: "Please enter a time for the event.",
+    }),
+  });
+
+  // Form setup
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      time: "",
+    },
+  });
+
+  // Handle form submission
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // Here you would typically add the event to your events list or make an API call
+    console.log(values);
+    toast("Event added successfully!", {
+      description: `${values.title} scheduled for ${format(values.date, "MMM dd, yyyy")} at ${values.time}`,
+    });
+    form.reset();
+  }
+
   return (
     <div className="min-h-screen pt-24 px-6 content-section">
       <div className="max-w-4xl mx-auto">
@@ -47,6 +109,123 @@ const Calendar: React.FC = () => {
         </div>
         <h1 className="text-4xl font-bold mb-6">Calendar</h1>
 
+        {/* Event Creation Form */}
+        <div className="glass p-6 md:p-8 rounded-xl mb-8">
+          <h2 className="text-2xl font-bold mb-6">Create New Event</h2>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter event title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Category</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select event category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {eventTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Event Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              
+                <FormField
+                  control={form.control}
+                  name="time"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Time</FormLabel>
+                      <div className="flex items-center">
+                        <FormControl>
+                          <Input 
+                            type="time" 
+                            placeholder="Select time" 
+                            {...field} 
+                            className="flex-1"
+                          />
+                        </FormControl>
+                        <Clock className="ml-2 h-4 w-4 text-gray-400" />
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Button type="submit" className="w-full md:w-auto">Create Event</Button>
+            </form>
+          </Form>
+        </div>
+
+        {/* Calendar View */}
         <div className="glass p-6 md:p-8 rounded-xl mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <h2 className="text-2xl font-bold">June 2023</h2>
@@ -99,6 +278,7 @@ const Calendar: React.FC = () => {
           </div>
         </div>
 
+        {/* Upcoming Events */}
         <div className="glass p-8 rounded-xl">
           <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
           <div className="space-y-4">
