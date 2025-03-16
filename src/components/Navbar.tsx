@@ -79,6 +79,12 @@ const Navbar: React.FC = () => {
             >
               Calendar
             </Link>
+            <Link
+              to="/members"
+              className={`nav-link ${isActive('/members') ? 'active' : ''}`}
+            >
+              Members
+            </Link>
           </nav>
 
           {/* Profile (Desktop) */}
@@ -114,6 +120,13 @@ const Navbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Calendar
+            </Link>
+            <Link
+              to="/members"
+              className={`nav-link text-center ${isActive('/members') ? 'bg-secondary/50' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Members
             </Link>
             <div className="pt-2 border-t border-gray-200">
               <Link

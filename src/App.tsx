@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Group from "./pages/Group";
 import Resources from "./pages/Resources";
 import Calendar from "./pages/Calendar";
+import Members from "./pages/Members";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 
@@ -45,6 +46,15 @@ const App = () => (
               <>
                 <Navbar />
                 <Calendar />
+              </>
+            }
+          />
+          <Route
+            path="/members"
+            element={
+              <>
+                <Navbar />
+                <Members />
               </>
             }
           />
