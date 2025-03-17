@@ -1,4 +1,5 @@
-
+import { useNavigate } from "react-router-dom";
+import ExpenseCard from '../cards/ExpenseCard';
 import React from 'react';
 
 const Group: React.FC = () => {
@@ -12,7 +13,7 @@ const Group: React.FC = () => {
         </div>
         <h1 className="text-4xl font-bold mb-6">Group</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {Array.from({ length: 3 }).map((_, i) => (
             <div 
               key={i}
@@ -27,7 +28,19 @@ const Group: React.FC = () => {
               </button>
             </div>
           ))}
+        </div> */}
+        <div>
+          <button
+            onClick={() => (window.location.href = "/create-group")}
+            className="px-5 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-2xl shadow-lg hover:from-indigo-600 hover:to-blue-500 transition-all duration-300 ease-in-out flex items-center gap-2"
+          >
+            Create a Group <span className="text-xl">+</span>
+          </button>
+
         </div>
+
+        <ExpenseCard />
+
 
         <div className="glass p-8 rounded-xl mb-12">
           <h2 className="text-2xl font-bold mb-6">Recent Activities</h2>
