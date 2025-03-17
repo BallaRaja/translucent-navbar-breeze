@@ -11,6 +11,7 @@ import Calendar from "./pages/Calendar";
 import Members from "./pages/Members";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
+import GroupExpenseManager from "./cards/GroupExpenseForm";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
               </>
             }
           />
+          <Route path="/create-group" element={<GroupExpenseManager />}/>
           <Route
             path="/resources"
             element={
